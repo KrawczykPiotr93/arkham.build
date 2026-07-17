@@ -165,7 +165,7 @@
       "title": "Scenariusze zawierające <em>{{name}}</em>",
       "tooltip": "{{name}} <em>({{campaignName}})</em>"
     },
-      "card_tags": {
+    "card_tags": {
       "account_title": "Tagi globalne",
       "create_named": "Stwórz \"{{name}}\"",
       "deck_placeholder": "Dodaj tag talii...",
