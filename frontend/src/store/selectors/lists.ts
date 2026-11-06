@@ -121,8 +121,8 @@ import {
   selectLocaleSortingCollator,
   selectLookupTables,
   selectMetadata,
+  selectRelationsContentFilter,
   selectSettingsTabooId,
-  selectShowFanMadeRelations,
   selectTraitMapper,
 } from "./shared";
 
@@ -1982,17 +1982,10 @@ export const selectAvailableUpgrades = createSelector(
   selectDeckInvestigatorFilter,
   selectMetadata,
   selectLookupTables,
-  selectShowFanMadeRelations,
+  selectRelationsContentFilter,
   (_: StoreState, deck: ResolvedDeck) => deck,
   (_: StoreState, __: ResolvedDeck, target: "slots" | "extraSlots") => target,
-  (
-    accessFilter,
-    metadata,
-    lookupTables,
-    showFanMadeRelations,
-    deck,
-    target,
-  ) => {
+  (accessFilter, metadata, lookupTables, contentFilter, deck, target) => {
     const availableUpgrades: AvailableUpgrades = {
       upgrades: {},
       shrewdAnalysisPresent: false,
@@ -2018,7 +2011,7 @@ export const selectAvailableUpgrades = createSelector(
         const isUpgrade = version?.xp && version.xp > (card.xp ?? 0);
         if (!isUpgrade) return acc;
 
-        if (!showFanMadeRelations && !official(version)) return acc;
+        if (!contentFilter(version)) return acc;
 
         const hasAccess = accessFilter?.(version);
         if (!hasAccess) return acc;
@@ -2178,7 +2171,7 @@ function selectHealthChanges(value: [number, number] | undefined) {
   return formatHealthChanges(value, i18n.t("filters.health.title"));
 }
 
-export function selectIllustratorChanges(value: MultiselectFilter) {
+function selectIllustratorChanges(value: MultiselectFilter) {
   const count = value.length;
   if (!count) return "";
   return value.join(` ${i18n.t("common.or")} `);
@@ -2358,6 +2351,10 @@ export function selectFilterChanges<T extends keyof FilterMapping>(
 
     case "health": {
       return selectHealthChanges(value as HealthFilter);
+    }
+
+    case "illustrator": {
+      return selectIllustratorChanges(value as MultiselectFilter);
     }
 
     case "investigator": {
